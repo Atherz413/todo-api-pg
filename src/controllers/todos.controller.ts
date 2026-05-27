@@ -3,7 +3,17 @@ import db from '../db';
 
 export const getAllTodos = async (req: Request, res: Response): Promise<void> => {
   try {
-    const result = await db.query('SELECT * FROM todos ORDER BY id ASC');
+    const { done } = req.query;
+
+    let result;
+    if (done === 'true') {
+      result = await db.query('SELECT * FROM todos WHERE done = TRUE ORDER BY id ASC');
+    } else if (done === 'false') {
+      result = await db.query('SELECT * FROM todos WHERE done = FALSE ORDER BY id ASC');
+    } else {
+      result = await db.query('SELECT * FROM todos ORDER BY id ASC');
+    }
+
     res.json({ data: result.rows });
   } catch (err) {
     res.status(500).json({ error: 'Internal server error' });
